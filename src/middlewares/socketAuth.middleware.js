@@ -1,5 +1,7 @@
+const jwt = require("jsonwebtoken");
+
 const ioAuthenticate = ((socket, next) => {
-  const token = socket.handshake.auth.token;
+const token = socket.handshake.auth.token;
 
   if (!token) {
     return next(new Error("Unauthorized"));

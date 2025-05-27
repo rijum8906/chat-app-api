@@ -1,12 +1,12 @@
-const Auth = require('./../../models/userAuthModel');
-const UserLoginHistory = require('./../../models/userLoginHistoryModel');
-const UserProfile = require('./../../models/userProfileModel');
-const appError = require('./../../utils/app-error');
+const Auth = require('./../../models/auth.model');
+const UserLoginHistory = require('./../../models/loginHistory.model');
+const UserProfile = require('./../../models/profile.model');
+const appError = require('./../../utils/error.utils');
 const {
   loginToDatabase,
   verifyGoogleToken
-} = require('./../../utils/authUtils');
-const redisClient = require('./../../configs/redisConfig');
+} = require('./../../utils/auth.utils');
+const redisClient = require('./../../configs/redis.config');
 
 /**
  * Login a user with correct credentials
