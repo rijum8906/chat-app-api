@@ -132,7 +132,7 @@ module.exports.loginOrRegisterByGoogle = async ({ userInfo, sessionInfo }) => {
   });
 
   // Step 2: Check if a user with the given email exists (regardless of Google link)
-  const isUserExists = await Auth.exists({ email });
+  const isUserExists = await Auth.findOne({ email });
 
   if (fetchedUser) {
     // Case 1: User exists and is linked with Google ID
@@ -162,7 +162,7 @@ module.exports.loginOrRegisterByGoogle = async ({ userInfo, sessionInfo }) => {
       username,
       registrationMethod: 'google',
       isEmailVerified: true,
-      profileInfo: newUserProfile._id
+      profileId: newUserProfile._id
     });
     newUser.socialLogins.google = {
       id: sub,

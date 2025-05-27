@@ -11,8 +11,6 @@ errorHandler
 } = require("./src/middlewares");
 require("dotenv").config();
 
-// Test
-const Auth = require("./src/models/auth.model");
 
 // Dependency Configs
 const connectDB = require("./src/configs/db.config");

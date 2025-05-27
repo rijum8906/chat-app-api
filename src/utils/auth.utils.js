@@ -11,13 +11,13 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
  * @returns {Object} formatted user data with profile info
  */
 const formatLoginData = async user => {
-  const userData = await user.populate('profileInfo');
-  const { username, email, profileInfo } = userData;
+  const userData = await user.populate('profileId');
+  const { username, email, profile } = userData;
   return {
     id: user._id,
     username,
     email,
-    profileInfo
+    profile
   };
 };
 
@@ -30,22 +30,25 @@ const formatLoginData = async user => {
  */
 const generateToken = ({ isRefreshToken, user }) => {
   const expiresIn = isRefreshToken
-    ? process.env.JWT_REFRESH_TOKEN_EXPIRES
-    : process.env.JWT_ACCESS_TOKEN_EXPIRES;
-  const secretKey = process.env.JWT_SECRET_KEY;
+    ? process.env.JWT_REFRESH_EXPIRES_IN
+    : process.env.JWT_ACCESS_EXPIRES_IN;
+  const secretKey = process.env.JWT_SECRET;
 
   // Create payload based on token type
   const payload = isRefreshToken
     ? { sub: user._id }
     : {
         sub: user._id,
-        profileId: user.profileInfo._id,
+        profile: {
+          id: user.profileId._id,
+          firstName: user.profileId.firstName,
+          lastName: user.profileId.lastName,
+          avatarURL: user.profileId.avatarURL
+        },
         role: user.role,
         username: user.username,
         email: user.email,
-        firstName: user.profileInfo.firstName,
-        lastName: user.profileInfo.lastName,
-        avatarURL: user.profileInfo.avatarURL
+        
       };
 
   return jwt.sign(payload, secretKey, { expiresIn });
@@ -59,7 +62,7 @@ const generateToken = ({ isRefreshToken, user }) => {
  * @returns {Object} Contains accessToken and refreshToken
  */
 module.exports.loginToDatabase = async (user, sessionInfo, method) => {
-  const userInfo = await user.populate('profileInfo');
+  const userInfo = await user.populate('profileId');
 
   // Generate JWT refresh and access tokens
   const refreshToken = generateToken({ isRefreshToken: true, user: userInfo });
