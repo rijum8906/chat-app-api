@@ -20,34 +20,39 @@ module.exports.loginUserByPass = async ({ sessionInfo, userInfo }) => {
 
   // Step 1: Fetch user by username or email
   const fetchedUser = (await Auth.aggregate([
-    {
+  {
+    $match: {
       $or: [
         { username },
         { email }
-        ]
-    },
-    {
-      $lookup: {
-        from: "profiles",
-        localField: "profileId",
-        foreignField: "_id",
-        as: "profile"
-      }
-    },
-    {
-      $project: {
-        _id: 0,
-        sub: "$_id",
-        email: 1,
-        username: 1,
-        profile: {
-          firstName: "$profile.firstName",
-          lastName: "$profile.lastName",
-          avatarURL: "$profile.avatarURL",
-        }
+      ]
+    }
+  },
+  {
+    $lookup: {
+      from: "profiles",
+      localField: "profileId",
+      foreignField: "_id",
+      as: "profile"
+    }
+  },
+  {
+    $unwind: "$profile"
+  },
+  {
+    $project: {
+      _id: 0,
+      sub: "$_id",
+      email: 1,
+      username: 1,
+      profile: {
+        firstName: "$profile.firstName",
+        lastName: "$profile.lastName",
+        avatarURL: "$profile.avatarURL",
       }
     }
-    ]))[0];
+  }
+]))[0];
 
   // Step 2: Validate credentials
   if (!fetchedUser || !(await fetchedUser.comparePassword(password))) {
