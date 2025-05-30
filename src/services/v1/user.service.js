@@ -29,6 +29,7 @@ module.exports.getUserInfoService = async (username) => {
     {
       $project: {
         _id: 0,
+        profileId: "$profile._id",
         firstName: "$profile.firstName",
         lastName: "$profile.lastName",
         avatarURL: "$profile.avatarURL",
