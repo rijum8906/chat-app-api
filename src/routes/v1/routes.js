@@ -8,7 +8,7 @@ const friendshipRouter = require('./friendship.routes');
 // Router
 const router = express.Router();
 router.use('/auth', authRouter);
-router.use('/friendship', friendshipRouter);
+router.use('/friendships', friendshipRouter);
 
 // Exports
 module.exports = router;
