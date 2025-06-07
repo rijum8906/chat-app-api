@@ -3,8 +3,9 @@ const express = require('express');
 
 // --- Controller Functions ---
 const {
-  getUserInfo
-} = require('./../../controllers/v1/friendship.controller');
+  getUserInfo,
+  // Todo getMyProfileInfo
+} = require('./../../controllers/v1/user.controller');
 
 // --- Middlewares ---
 const  ATVM = require('./../../middlewares/auth.middleware'); // access token verification middleware
@@ -13,5 +14,6 @@ const  ATVM = require('./../../middlewares/auth.middleware'); // access token ve
 const router = express.Router();
 
 router.get('/:username', getUserInfo);
+// Todo router.get('/me', ATVM, getMyProfileInfo);
 
 module.exports = router;

@@ -2,16 +2,16 @@
 const asyncHandler = require("express-async-handler");
 const AppError = require("./../../utils/error.utils");
 const { 
-  loginSchema, 
-  registerSchema, 
+  signinSchema, 
+  signupSchema, 
   googleAuthSchema, 
   accountLinkReqSchema
   } = require("./../../validators/auth.validator");
 const { 
-  loginUserByPass, 
-  loginOrRegisterByGoogle,
-  registerByPassword,
-  logoutUser,
+  signinUserByPass, 
+  signinOrsignupByGoogle,
+  signupByPassword,
+  signoutUser,
   linkUserAccount 
 } = require("./../../services/v1/auth.service");
 const { 
@@ -19,18 +19,18 @@ const {
 } = require("./../../utils/auth.utils");
 
 // Signin Controller
-module.exports.login = asyncHandler(async (req, res) => {
+module.exports.signin = asyncHandler(async (req, res) => {
   const userInfo = req.body;
   const sessionInfo = req.session;
 
-  // Step 1: Validate login payload using Joi schema
-  const { error: loginError } = loginSchema.validate(userInfo);
-  if (loginError) {
-    throw new AppError(loginError.details[0].message, 400);
+  // Step 1: Validate signin payload using Joi schema
+  const { error: signinError } = signinSchema.validate(userInfo);
+  if (signinError) {
+    throw new AppError(signinError.details[0].message, 400);
   }
 
   // Step 2: Authenticate user and generate tokens
-  const { accessToken, refreshToken } = await loginUserByPass({ sessionInfo, userInfo });
+  const { accessToken, refreshToken } = await signinUserByPass({ sessionInfo, userInfo });
 
   // Step 3: Set refresh token as HTTP-only cookie for secure session management
   res.cookie("token", refreshToken, {
@@ -48,19 +48,19 @@ module.exports.login = asyncHandler(async (req, res) => {
   });
 });
 
-// Register Controller
-module.exports.register = asyncHandler(async (req, res) => {
+// signup Controller
+module.exports.signup = asyncHandler(async (req, res) => {
   const userInfo = req.body;
   const sessionInfo = req.session;
 
   // Step 1: Validate user input using Joi schema
-  const { error: registerError } = registerSchema.validate(userInfo);
-  if (registerError) {
-    throw new AppError(registerError.details[0].message, 400);
+  const { error: signupError } = signupSchema.validate(userInfo);
+  if (signupError) {
+    throw new AppError(signupError.details[0].message, 400);
   }
 
-  // Step 2: Register the user and generate authentication tokens
-  const { accessToken, refreshToken } = await registerByPassword({ sessionInfo, userInfo });
+  // Step 2: signup the user and generate authentication tokens
+  const { accessToken, refreshToken } = await signupByPassword({ sessionInfo, userInfo });
 
   // Step 3: Set the refresh token as a secure, HTTP-only cookie
   res.cookie("token", refreshToken, {
@@ -99,8 +99,8 @@ module.exports.googleAuth = asyncHandler(async (req, res) => {
     throw new AppError(oauthError.details[0].message, 400);
   }
 
-  // Step 4: Handle login or register logic via Google and generate tokens
-  const { accessToken, refreshToken } = await loginOrRegisterByGoogle({ sessionInfo, userInfo });
+  // Step 4: Handle signin or signup logic via Google and generate tokens
+  const { accessToken, refreshToken } = await signinOrsignupByGoogle({ sessionInfo, userInfo });
 
   // Step 5: Set refresh token in secure HTTP-only cookie
   res.cookie("token", refreshToken, {
@@ -119,13 +119,13 @@ module.exports.googleAuth = asyncHandler(async (req, res) => {
 });
 
 
-// Logout Controller
-module.exports.logout = asyncHandler(async (req, res) => {
+// signout Controller
+module.exports.signout = asyncHandler(async (req, res) => {
   const { deviceId } = req.session;
   const userId = req.user.sub;
 
   // Step 1: Invalidate the session/device from the user's active sessions
-  const success = await logoutUser({ deviceId, userId });
+  const success = await signoutUser({ deviceId, userId });
   
   // Step 2: Clear the cookies 
   res.clearCookie("token", {
@@ -134,7 +134,7 @@ module.exports.logout = asyncHandler(async (req, res) => {
   secure: process.env.NODE_ENV === "production",
 });
 
-  // Step 3: Send logout status response
+  // Step 3: Send signout status response
   return res.status(200).json({
     success,
   });

@@ -3,10 +3,10 @@ const express = require('express');
 
 // --- Controller Functions ---
 const {
-  login,
-  register,
+  signin,
+  signup,
   googleAuth,
-  logout,
+  signout,
   linkAccount
 } = require('./../../controllers/v1/auth.controller');
 
@@ -16,10 +16,10 @@ const  ATVM = require('./../../middlewares/auth.middleware'); // access token ve
 
 const router = express.Router();
 
-router.post('/login', login);
-router.post('/register', register);
-router.post('/continue-with-google', googleAuth);
-router.post('/logout', ATVM, logout);
+router.post('/signin', signin);
+router.post('/signup', signup);
+router.post('/google', googleAuth);
+router.post('/signout', ATVM, signout);
 router.post('/link-account', ATVM, linkAccount);
 
 module.exports = router;

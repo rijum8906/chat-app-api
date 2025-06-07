@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 // Signin Schema
-module.exports.loginSchema = Joi.object({
+module.exports.signinSchema = Joi.object({
   email: Joi.string().email().messages({
     'string.email': 'Please provide a valid email address'
   }),
@@ -19,7 +19,7 @@ module.exports.loginSchema = Joi.object({
 }).xor('email', 'username'); // Ensures either email or username is provided, but not both
 
 // Signup Schema
-module.exports.registerSchema = Joi.object({
+module.exports.signupSchema = Joi.object({
   firstName: Joi.string().min(2).max(20).required().messages({
     'string.min': 'First name must be at least {#limit} characters long',
     'string.max': 'First name cannot exceed {#limit} characters',

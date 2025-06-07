@@ -45,8 +45,8 @@ const userAuthSchema = new mongoose.Schema(
       select: false
     },
 
-    // --- Social Logins ---
-    socialLogins: {
+    // --- Social signins ---
+    socialsignins: {
       google: {
         id: { type: String },
         email: String
@@ -57,8 +57,8 @@ const userAuthSchema = new mongoose.Schema(
       }
     },
 
-    // --- Login Information ---
-    lastLogin: {
+    // --- signin Information ---
+    lastsignin: {
       timestamp: {
         type: Date,
         default: Date.now
@@ -101,7 +101,7 @@ const userAuthSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
-    failedLoginAttempts: [
+    failedsigninAttempts: [
       {
         ipAddress: String,
         userAgent: String,
@@ -165,7 +165,7 @@ userAuthSchema.methods.createPasswordResetToken = function () {
   return resetToken;
 };
 
-// --- Add/Update Sessions on Login ---
+// --- Add/Update Sessions on signin ---
 userAuthSchema.methods.addSession = function (sessionInfo) {
   // Find existing session for this device
   const existingSessionIndex = this.activeSessions.findIndex(
@@ -182,16 +182,16 @@ userAuthSchema.methods.addSession = function (sessionInfo) {
 };
 
 // --- Account Locking for Brute Force ---
-userAuthSchema.methods.incrementLoginAttempts = function (deviceInfo) {
+userAuthSchema.methods.incrementsigninAttempts = function (deviceInfo) {
 
-  this.loginAttempts;
+  this.signinAttempts;
 };
 
 // --- Indexes ---
 userAuthSchema.index({ email: 1 }, { unique: true });
 userAuthSchema.index({ username: 1 }, { unique: true });
-userAuthSchema.index({ 'socialLogins.google.id': 1 });
-userAuthSchema.index({ 'socialLogins.github.id': 1 });
+userAuthSchema.index({ 'socialsignins.google.id': 1 });
+userAuthSchema.index({ 'socialsignins.github.id': 1 });
 
 const Auth = mongoose.model('UserAuth', userAuthSchema);
 module.exports = Auth;

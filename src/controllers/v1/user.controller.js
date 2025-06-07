@@ -3,7 +3,7 @@ const asyncHandler = require("express-async-handler");
 const AppError = require("./../../utils/error.utils");
 const {
   getUserInfoService
-} = require("./../../services/v1/friendship.service");
+} = require("./../../services/v1/user.service");
 
 
 /**
@@ -17,12 +17,12 @@ const {
 module.exports.getUserInfo = asyncHandler(async (req, res) => {
   const { username } = req.params;
 
-  const userInfo = await getUserInfoService(username);
+  const usersInfo = await getUserInfoService(username);
 
   return res.status(200).json({
     success: true,
     data: {
-      user: userInfo
+      users: usersInfo
     }
   });
 });

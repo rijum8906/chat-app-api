@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const loginHistorySchema = new mongoose.Schema(
+const signinHistorySchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -27,11 +27,11 @@ const loginHistorySchema = new mongoose.Schema(
 );
 
 // Add TTL index - records will expire after 90 days (adjust as needed)
-loginHistorySchema.index({ createdAt: 1 }, { expireAfterSeconds: 10 * 60 });
+signinHistorySchema.index({ createdAt: 1 }, { expireAfterSeconds: 10 * 60 });
 
 // Add index for frequently queried fields
-loginHistorySchema.index({ userId: 1 });
-loginHistorySchema.index({ status: 1 });
-loginHistorySchema.index({ method: 1 });
+signinHistorySchema.index({ userId: 1 });
+signinHistorySchema.index({ status: 1 });
+signinHistorySchema.index({ method: 1 });
 
-module.exports = mongoose.model('LoginHistory', loginHistorySchema);
+module.exports = mongoose.model('signinHistory', signinHistorySchema);

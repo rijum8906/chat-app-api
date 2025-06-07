@@ -1,6 +1,6 @@
 // --- Dependenciesb ---
 const Friendship = require('./../../models/friendship.model');
-const appError = require('./../../utils/error.utils');
+const AppError = require('./../../utils/error.utils');
 const Profile = require('./../../models/profile.model');
 const mongoose = require('mongoose');
 

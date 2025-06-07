@@ -12,7 +12,7 @@ const Auth = require('./../../models/auth.model');
  * @throws {AppError} If no user is found with the given username
  */
 module.exports.getUserInfoService = async (username) => {
-  const [fetchedUser] = await Auth.aggregate([
+  const fetchedUsers = await Auth.aggregate([
     {
       $match: {
         username: username
@@ -28,19 +28,20 @@ module.exports.getUserInfoService = async (username) => {
     },
     {
       $project: {
-        _id: 0,
-        profileId: "$profile._id",
-        firstName: "$profile.firstName",
-        lastName: "$profile.lastName",
-        avatarURL: "$profile.avatarURL",
-        bio: "$profile.bio"
+      _id: 0,
+      username,
+      firstName: { $arrayElemAt: ["$profile.firstName", 0] },
+      lastName: { $arrayElemAt: ["$profile.lastName", 0] },
+      avatarURL: { $arrayElemAt: ["$profile.avatarURL", 0] },
+      bio: { $arrayElemAt: ["$profile.bio", 0] },
+      id: { $arrayElemAt: ["$profile._id", 0] }
       }
     }
-  ]);
+]);
 
-  if (!fetchedUser) {
+  if (!fetchedUsers) {
     throw new AppError("No user found", 404);
   }
 
-  return fetchedUser;
+  return fetchedUsers;
 };

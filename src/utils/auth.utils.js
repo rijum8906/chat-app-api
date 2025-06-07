@@ -1,25 +1,9 @@
 const jwt = require('jsonwebtoken');
-const UserLoginHistory = require('./../models/loginHistory.model.js');
+const UserSigninHistory = require('./../models/signinHistory.model.js');
 const UserProfile = require('./../models/profile.model');
 const redisClient = require('./../configs/redis.config');
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
-/**
- * Format user data by populating profile information
- * @param {Object} user - User document
- * @returns {Object} formatted user data with profile info
- */
-const formatLoginData = async user => {
-  const userData = await user.populate('profileId');
-  const { username, email, profile } = userData;
-  return {
-    id: user._id,
-    username,
-    email,
-    profile
-  };
-};
 
 /**
  * Generate JWT token (access or refresh)
@@ -51,17 +35,17 @@ const generateToken = ({ isRefreshToken, user }) => {
         
       };
 
-  return jwt.sign(payload, secretKey, { expiresIn });
+  return jwt.sign(payload, secretKey, { algorithm: 'RS256', expiresIn });
 };
 
 /**
- * Perform user login steps including token generation, session tracking, and login history
+ * Perform user signin steps including token generation, session tracking, and signin history
  * @param {Object} user - User document
  * @param {Object} sessionInfo - Session related info (IP, device, userAgent, etc.)
  * @param {String} method - Authentication method ('password', 'google', etc.)
  * @returns {Object} Contains accessToken and refreshToken
  */
-module.exports.loginToDatabase = async (user, sessionInfo, method) => {
+module.exports.signinToDatabase = async (user, sessionInfo, method) => {
   const userInfo = await user.populate('profileId');
 
   // Generate JWT refresh and access tokens
@@ -80,15 +64,15 @@ module.exports.loginToDatabase = async (user, sessionInfo, method) => {
     method
   });
 
-  // Record login history for auditing
-  const newLoginData = new UserLoginHistory({
+  // Record signin history for auditing
+  const newsigninData = new UserSigninHistory({
     userId: user._id,
     ...sessionInfo,
     method
   });
 
   await user.save();
-  await newLoginData.save();
+  await newsigninData.save();
 
   return {
     accessToken,
