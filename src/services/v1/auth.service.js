@@ -2,10 +2,7 @@ const Auth = require('./../../models/auth.model');
 const UserSigninHistory = require('./../../models/signinHistory.model');
 const UserProfile = require('./../../models/profile.model');
 const AppError = require('./../../utils/error.utils');
-const {
-  signinToDatabase,
-  verifyGoogleToken
-} = require('./../../utils/auth.utils');
+const { signinToDatabase, verifyGoogleToken } = require('./../../utils/auth.utils');
 const redisClient = require('./../../configs/redis.config');
 
 /**
@@ -19,40 +16,7 @@ module.exports.signinUserByPass = async ({ sessionInfo, userInfo }) => {
   const { username, password, email } = userInfo;
 
   // Step 1: Fetch user by username or email
-  const fetchedUser = (await Auth.aggregate([
-  {
-    $match: {
-      $or: [
-        { username },
-        { email }
-      ]
-    }
-  },
-  {
-    $lookup: {
-      from: "profiles",
-      localField: "profileId",
-      foreignField: "_id",
-      as: "profile"
-    }
-  },
-  {
-    $unwind: "$profile"
-  },
-  {
-    $project: {
-      _id: 0,
-      sub: "$_id",
-      email: 1,
-      username: 1,
-      profile: {
-        firstName: "$profile.firstName",
-        lastName: "$profile.lastName",
-        avatarURL: "$profile.avatarURL",
-      }
-    }
-  }
-]))[0];
+  const fetchedUser = await Auth.findOne({$or: [{ username }, { email }]});
 
   // Step 2: Validate credentials
   if (!fetchedUser || !(await fetchedUser.comparePassword(password))) {
@@ -131,10 +95,7 @@ module.exports.signinOrsignupByGoogle = async ({ userInfo, sessionInfo }) => {
   const { firstName, lastName, sub, email, username, avatarURL } = userInfo;
 
   // Step 1: Attempt to find user by Google ID and email
-  const fetchedUser = await Auth.findOne({
-    email,
-    'socialsignins.google.id': sub
-  });
+  const fetchedUser = await Auth.findOne({'socialsignins.google.id': sub, email});
 
   // Step 2: Check if a user with the given email exists (regardless of Google link)
   const isUserExists = await Auth.findOne({ email });
@@ -143,13 +104,11 @@ module.exports.signinOrsignupByGoogle = async ({ userInfo, sessionInfo }) => {
     // Case 1: User exists and is linked with Google ID
     // Proceed with signin flow
     const responseData = await signinToDatabase(fetchedUser, sessionInfo, 'google');
-    return responseData;
-
+    return { authType: 'signin', ...responseData };
   } else if (isUserExists) {
     // Case 2: Email exists but not linked with Google account
     // Prevent duplicate accounts for same email
     throw new AppError('Email already in use.', 409);
-
   } else {
     // Case 3: New user registration with Google OAuth
     // Create user profile with optional avatar and IP address
@@ -177,7 +136,7 @@ module.exports.signinOrsignupByGoogle = async ({ userInfo, sessionInfo }) => {
 
     // Complete signin process and generate tokens
     const responseData = await signinToDatabase(newUser, sessionInfo, 'google');
-    return responseData;
+    return { authType: 'signup', ...responseData };
   }
 };
 
@@ -238,7 +197,7 @@ module.exports.linkUserAccount = async ({ deviceId, userInfo, linkWith, token })
   }
 
   // Handle linking for Google OAuth
-  if (linkWith === "google") {
+  if (linkWith === 'google') {
     // Verify the token with Google and get token data
     const tokenData = await verifyGoogleToken(token);
 
@@ -257,7 +216,7 @@ module.exports.linkUserAccount = async ({ deviceId, userInfo, linkWith, token })
     // Save social signin info on user
     user.socialsignins[linkWith] = {
       id: tokenData.sub,
-      email: tokenData.email,
+      email: tokenData.email
     };
 
     // Persist user changes

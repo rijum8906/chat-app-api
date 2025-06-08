@@ -1,10 +1,10 @@
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 
-const ioAuthenticate = ((socket, next) => {
-const token = socket.handshake.auth.token;
+const ioAuthenticate = (socket, next) => {
+  const token = socket.handshake.auth.token;
 
   if (!token) {
-    return next(new Error("Unauthorized"));
+    return next(new Error('Unauthorized'));
   }
 
   try {
@@ -12,9 +12,8 @@ const token = socket.handshake.auth.token;
     socket.user = payload; // Attach user data to socket
     next();
   } catch (err) {
-    return next(new Error("Invalid Token"));
+    return next(new Error('Invalid Token'));
   }
-});
-
+};
 
 module.exports = ioAuthenticate;

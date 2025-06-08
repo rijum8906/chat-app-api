@@ -1,0 +1,94 @@
+{
+  "success": {
+    "OK": {
+      "code": 2000,
+      "message": "Request completed successfully."
+    },
+    "CREATED": {
+      "code": 2001,
+      "message": "Resource created successfully."
+    },
+    "UPDATED": {
+      "code": 2002,
+      "message": "Resource updated successfully."
+    },
+    "DELETED": {
+      "code": 2003,
+      "message": "Resource deleted successfully."
+    },
+    "FETCH_SUCCESS": {
+      "code": 2004,
+      "message": "Data fetched successfully."
+    },
+    "SIGNIN_SUCCESS": {
+      "code": 2005,
+      "message": "Signed in successfully."
+    },
+    "SIGNOUT_SUCCESS": {
+      "code": 2006,
+      "message": "Signed out successfully."
+    },
+    "SIGNUP_SUCCESS": {
+      "code": 2007,
+      "message": "Account created successfully."
+    },
+    "ACCOUNT_LINKED": {
+      "code": 2008,
+      "message": "Account linked successfully."
+    }
+  },
+  "error": {
+    "BAD_REQUEST": {
+      "code": 4000,
+      "message": "Invalid request parameters."
+    },
+    "UNAUTHORIZED": {
+      "code": 4001,
+      "message": "Authentication required."
+    },
+    "FORBIDDEN": {
+      "code": 4003,
+      "message": "You do not have permission to perform this action."
+    },
+    "NOT_FOUND": {
+      "code": 4004,
+      "message": "Resource not found."
+    },
+    "CONFLICT": {
+      "code": 4009,
+      "message": "Resource already exists."
+    },
+    "VALIDATION_FAILED": {
+      "code": 4010,
+      "message": "Validation failed for the provided data."
+    },
+    "INTERNAL_SERVER_ERROR": {
+      "code": 5000,
+      "message": "An unexpected error occurred. Please try again later."
+    },
+    "SIGNIN_FAILED": {
+      "code": 4005,
+      "message": "Invalid username or password."
+    },
+    "SIGNOUT_FAILED": {
+      "code": 4011,
+      "message": "Failed to sign out."
+    },
+    "SIGNUP_FAILED": {
+      "code": 4012,
+      "message": "Failed to created account."
+    },
+    "ACCESS_DENIED": {
+      "code": 4006,
+      "message": "Access denied."
+    },
+    "TOKEN_EXPIRED": {
+      "code": 4007,
+      "message": "Session expired. Please log in again."
+    },
+    "RATE_LIMIT": {
+      "code": 4008,
+      "message": "Too many requests. Please try again later."
+    }
+  }
+}

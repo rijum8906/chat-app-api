@@ -8,14 +8,20 @@ const userProfileSchema = new mongoose.Schema(
       required: [true, 'First name is required'],
       trim: true,
       minlength: 2,
-      maxlength: 50
+      maxlength: 20
     },
     lastName: {
       type: String,
       required: [true, 'Last name is required'],
       trim: true,
       minlength: 2,
-      maxlength: 50
+      maxlength: 20
+    },
+    displayName: {
+      type: String,
+      default: function () {
+        return this.firstName;
+      }
     },
     location: {
       type: String

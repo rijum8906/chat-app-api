@@ -1,25 +1,24 @@
 // Dependencies
-const asyncHandler = require("express-async-handler");
-const AppError = require("./../../utils/error.utils");
-const { 
-  signinSchema, 
-  signupSchema, 
-  googleAuthSchema, 
+const asyncHandler = require('express-async-handler');
+const AppError = require('./../../utils/error.utils');
+const responses = require('./../../configs/responses.json');
+const {
+  signinSchema,
+  signupSchema,
+  googleAuthSchema,
   accountLinkReqSchema
-  } = require("./../../validators/auth.validator");
-const { 
-  signinUserByPass, 
+} = require('./../../validators/auth.validator');
+const {
+  signinUserByPass,
   signinOrsignupByGoogle,
   signupByPassword,
   signoutUser,
-  linkUserAccount 
-} = require("./../../services/v1/auth.service");
-const { 
-  verifyGoogleToken 
-} = require("./../../utils/auth.utils");
+  linkUserAccount
+} = require('./../../services/v1/auth.service');
+const { verifyGoogleToken } = require('./../../utils/auth.utils');
 
 // Signin Controller
-module.exports.signin = asyncHandler(async (req, res) => {
+module.exports.signIn = asyncHandler(async (req, res) => {
   const userInfo = req.body;
   const sessionInfo = req.session;
 
@@ -30,26 +29,28 @@ module.exports.signin = asyncHandler(async (req, res) => {
   }
 
   // Step 2: Authenticate user and generate tokens
-  const { accessToken, refreshToken } = await signinUserByPass({ sessionInfo, userInfo });
+  const { user, accessToken, refreshToken } = await signinUserByPass({ sessionInfo, userInfo });
 
   // Step 3: Set refresh token as HTTP-only cookie for secure session management
-  res.cookie("token", refreshToken, {
+  res.cookie('token', refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-    sameSite: "lax", // Prevent CSRF in most modern browsers
+    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+    sameSite: 'lax' // Prevent CSRF in most modern browsers
   });
 
   // Step 4: Send access token in response body
   return res.status(200).json({
     success: true,
+    message: responses.success.SIGNIN_SUCCESS.message,
     data: {
       token: accessToken,
-    },
+      user
+    }
   });
 });
 
 // signup Controller
-module.exports.signup = asyncHandler(async (req, res) => {
+module.exports.signUp = asyncHandler(async (req, res) => {
   const userInfo = req.body;
   const sessionInfo = req.session;
 
@@ -60,21 +61,23 @@ module.exports.signup = asyncHandler(async (req, res) => {
   }
 
   // Step 2: signup the user and generate authentication tokens
-  const { accessToken, refreshToken } = await signupByPassword({ sessionInfo, userInfo });
+  const { user, accessToken, refreshToken } = await signupByPassword({ sessionInfo, userInfo });
 
   // Step 3: Set the refresh token as a secure, HTTP-only cookie
-  res.cookie("token", refreshToken, {
+  res.cookie('token', refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // Enable secure cookie in production
-    sameSite: "lax", // Helps prevent CSRF
+    secure: process.env.NODE_ENV === 'production', // Enable secure cookie in production
+    sameSite: 'lax' // Helps prevent CSRF
   });
 
   // Step 4: Send access token in response body
   return res.status(200).json({
     success: true,
+    message: responses.success.SIGNUP_SUCCESS.message,
     data: {
       token: accessToken,
-    },
+      user
+    }
   });
 });
 
@@ -82,13 +85,16 @@ module.exports.signup = asyncHandler(async (req, res) => {
 module.exports.googleAuth = asyncHandler(async (req, res) => {
   const { token } = req.body;
 
+  // store the info whether the use signed in or signed up
+  var authSuccessType;
+
   // Step 1: Verify and decode the Google token
   const tokenData = await verifyGoogleToken(token);
 
   const sessionInfo = req.session;
 
   // Step 2: Generate a fallback username using email + part of the Google sub
-  const username = (tokenData.email.split("@")[0] + tokenData.sub.substr(0, 5)).substr(0, 15);
+  const username = (tokenData.email.split('@')[0] + tokenData.sub.substr(0, 5)).substr(0, 15);
 
   // Merge username with decoded token data
   const userInfo = { username, ...tokenData };
@@ -100,43 +106,45 @@ module.exports.googleAuth = asyncHandler(async (req, res) => {
   }
 
   // Step 4: Handle signin or signup logic via Google and generate tokens
-  const { accessToken, refreshToken } = await signinOrsignupByGoogle({ sessionInfo, userInfo });
+  const { user, accessToken, refreshToken, authType } = await signinOrsignupByGoogle({ sessionInfo, userInfo });
 
   // Step 5: Set refresh token in secure HTTP-only cookie
-  res.cookie("token", refreshToken, {
+  res.cookie('token', refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-    sameSite: "lax", // Helps mitigate CSRF
+    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+    sameSite: 'lax' // Helps mitigate CSRF
   });
 
   // Step 6: Return access token in the response body
   return res.status(200).json({
     success: true,
+    message: authType === 'signin' ? responses.success.SIGNIN_SUCCESS.message : responses.success.SIGNUP_SUCCESS.message,
     data: {
       token: accessToken,
-    },
+      user 
+    }
   });
 });
 
-
 // signout Controller
-module.exports.signout = asyncHandler(async (req, res) => {
+module.exports.signOut = asyncHandler(async (req, res) => {
   const { deviceId } = req.session;
   const userId = req.user.sub;
 
   // Step 1: Invalidate the session/device from the user's active sessions
   const success = await signoutUser({ deviceId, userId });
-  
-  // Step 2: Clear the cookies 
-  res.clearCookie("token", {
-  httpOnly: true,
-  sameSite: "lax",
-  secure: process.env.NODE_ENV === "production",
-});
+
+  // Step 2: Clear the cookies
+  res.clearCookie('token', {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production'
+  });
 
   // Step 3: Send signout status response
   return res.status(200).json({
     success,
+    message: responses.success.SIGNOUT_SUCCESS.message
   });
 });
 
@@ -158,5 +166,6 @@ module.exports.linkAccount = asyncHandler(async (req, res) => {
   // Step 3: Return the result of the linking operation
   return res.status(200).json({
     success,
+    message: responses.success.ACCOUNT_LINKED.message
   });
 });

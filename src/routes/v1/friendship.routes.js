@@ -2,15 +2,10 @@
 const express = require('express');
 
 // --- Controller Functions ---
-const {
-  getFriends,
-  sendFriendReq,
-  respondToFriendReq
-} = require('./../../controllers/v1/friendship.controller');
+const { getFriends, sendFriendReq, respondToFriendReq } = require('./../../controllers/v1/friendship.controller');
 
 // --- Middlewares ---
-const  ATVM = require('./../../middlewares/auth.middleware'); // access token verification middleware
-
+const ATVM = require('./../../middlewares/auth.middleware'); // access token verification middleware
 
 const router = express.Router();
 

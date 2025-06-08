@@ -4,9 +4,7 @@ const AppError = require('./../utils/error.utils');
 const { compareKey } = require('./../utils/redis.utils');
 
 const authenticateAccessToken = asyncHandler(async (req, res, next) => {
-  const accessToken =
-    req.cookies.accessToken ||
-    req.headers.authorization?.replace('Bearer ', '');
+  const accessToken = req.cookies.accessToken || req.headers.authorization?.replace('Bearer ', '');
 
   if (!accessToken) {
     throw new AppError('Token is not provided', 401);

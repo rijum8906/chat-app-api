@@ -1,36 +1,36 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const messageSchema = new mongoose.Schema(
   {
     sender: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Profile",
-      required: true,
+      ref: 'Profile',
+      required: true
     },
     chat: {
       type: mongoose.Schema.Types.oObjectId,
-      ref: "Chat",
-      required: true,
+      ref: 'Chat',
+      required: true
     },
     content: {
       type: String,
-      enum: ["text","video","audio","file","image"],
-      default: "text",
+      enum: ['text', 'video', 'audio', 'file', 'image'],
+      default: 'text',
       required: true,
-      trim: true,
+      trim: true
     },
     readBy: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Profile",
-      },
-    ],
+        ref: 'Profile'
+      }
+    ]
   },
   {
     timestamps: true,
     toJSON: { virtuals: true },
-    toObject: { virtuals: true },
-  },
+    toObject: { virtuals: true }
+  }
 );
 
-module.exports = mongoose.model("Message", messageSchema);
+module.exports = mongoose.model('Message', messageSchema);

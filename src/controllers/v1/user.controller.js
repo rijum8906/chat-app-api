@@ -1,10 +1,7 @@
 // --- Dependencies ---
-const asyncHandler = require("express-async-handler");
-const AppError = require("./../../utils/error.utils");
-const {
-  getUserInfoService
-} = require("./../../services/v1/user.service");
-
+const asyncHandler = require('express-async-handler');
+const AppError = require('./../../utils/error.utils');
+const { getUserInfoService } = require('./../../services/v1/user.service');
 
 /**
  * @desc    Get public user information by username

@@ -3,13 +3,12 @@ const express = require('express');
 
 // --- Controller Functions ---
 const {
-  getUserInfo,
+  getUserInfo
   // Todo getMyProfileInfo
 } = require('./../../controllers/v1/user.controller');
 
 // --- Middlewares ---
-const  ATVM = require('./../../middlewares/auth.middleware'); // access token verification middleware
-
+const ATVM = require('./../../middlewares/auth.middleware'); // access token verification middleware
 
 const router = express.Router();
 

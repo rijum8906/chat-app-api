@@ -1,13 +1,11 @@
 // --- Dependencies ---
-const asyncHandler = require("express-async-handler");
-const AppError = require("./../../utils/error.utils");
-const {
-  getFriendsService
-} = require("./../../services/v1/friendship.service");
+const asyncHandler = require('express-async-handler');
+const AppError = require('./../../utils/error.utils');
+const { getFriendsService } = require('./../../services/v1/friendship.service');
 
 /**
  * Get a paginated list of user's friends.
- * 
+ *
  * @param {Number} limit - Number of friends to return.
  * @param {Number} skip - Number of friends to skip.
  */
@@ -22,18 +20,16 @@ module.exports.getFriends = asyncHandler(async (req, res) => {
   if (isNaN(limit) || isNaN(skip)) {
     throw new AppError("Query parameters 'limit' and 'skip' must be valid numbers.", 400);
   }
-  
-  const friends = await getFriendsService(userId, {limit, skip});
-  
+
+  const friends = await getFriendsService(userId, { limit, skip });
+
   return res.status(200).json({
     success: true,
     data: {
-      friends,
+      friends
     }
   });
 });
-
-
 
 /**
  * Send a friend request to another user.
@@ -50,17 +46,15 @@ module.exports.sendFriendReq = asyncHandler(async (req, res) => {
 
   // Prevent sending a request to self
   if (senderId === receiverId) {
-    throw new AppError("You cannot send a friend request to yourself.", 400);
+    throw new AppError('You cannot send a friend request to yourself.', 400);
   }
-  
+
   const friendReq = await sendFriendReqService(senderId, receiverId);
 
   return res.status(201).json({
     success: true
   });
 });
-
-
 
 /**
  * Respond to a friend request (accept or reject).
@@ -74,12 +68,12 @@ module.exports.respondToFriendReq = asyncHandler(async (req, res) => {
   const userId = req.user.sub;
   const { requestId, action } = req.body;
 
-  if (!["accept", "reject"].includes(action)) {
+  if (!['accept', 'reject'].includes(action)) {
     throw new AppError("Action must be either 'accept' or 'reject'.", 400);
   }
 
   if (!requestId) {
-    throw new AppError("Friend request ID is required.", 400);
+    throw new AppError('Friend request ID is required.', 400);
   }
 
   const friend = await respondToFriendReqService(userId, requestId, action);

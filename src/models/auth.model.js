@@ -19,14 +19,11 @@ const userAuthSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Username is required'],
       trim: true,
-      match: [
-        /^[a-z0-9_]+$/,
-        'Username must be lowercase alphanumeric + underscores'
-      ],
+      match: [/^[a-z0-9_]+$/, 'Username must be lowercase alphanumeric + underscores'],
       minlength: 3,
       maxlength: 30
     },
-    role: {
+    roles: {
       type: String,
       enum: ['user', 'admin'],
       default: 'user'
@@ -156,10 +153,7 @@ userAuthSchema.methods.comparePassword = async function (candidatePassword) {
 // --- Password Reset Token ---
 userAuthSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString('hex');
-  this.passwordResetToken = crypto
-    .createHash('sha256')
-    .update(resetToken)
-    .digest('hex');
+  this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
   this.passwordResetTokenExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
 
   return resetToken;
@@ -168,9 +162,7 @@ userAuthSchema.methods.createPasswordResetToken = function () {
 // --- Add/Update Sessions on signin ---
 userAuthSchema.methods.addSession = function (sessionInfo) {
   // Find existing session for this device
-  const existingSessionIndex = this.activeSessions.findIndex(
-    session => session.deviceId === sessionInfo.deviceId
-  );
+  const existingSessionIndex = this.activeSessions.findIndex(session => session.deviceId === sessionInfo.deviceId);
 
   if (existingSessionIndex >= 0) {
     // Update existing session
@@ -183,7 +175,6 @@ userAuthSchema.methods.addSession = function (sessionInfo) {
 
 // --- Account Locking for Brute Force ---
 userAuthSchema.methods.incrementsigninAttempts = function (deviceInfo) {
-
   this.signinAttempts;
 };
 
